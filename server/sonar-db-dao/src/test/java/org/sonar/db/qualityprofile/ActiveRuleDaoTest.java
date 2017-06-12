@@ -151,11 +151,27 @@ public class ActiveRuleDaoTest {
   }
 
   @Test
-  public void selectByProfileUuid_ignores_removed_rules() throws Exception {
+  public void selectByProfileUuid_ignores_removed_rules() {
     ActiveRuleDto activeRule = createFor(profile1, removedRule).setSeverity(BLOCKER);
     underTest.insert(dbSession, activeRule);
 
     assertThat(underTest.selectByProfile(dbSession, profile1)).isEmpty();
+  }
+
+  @Test
+  public void selectByRuleProfileUuid() {
+    ActiveRuleDto activeRule1 = createFor(profile1, rule1).setSeverity(BLOCKER);
+    ActiveRuleDto activeRule2 = createFor(profile1, rule2).setSeverity(MAJOR);
+    underTest.insert(dbSession, activeRule1);
+    underTest.insert(dbSession, activeRule2);
+
+    List<ActiveRuleDto> result = underTest.selectByRuleProfile(dbSession, RulesProfileDto.from(profile1));
+    assertThat(result)
+      .hasSize(2)
+      .extracting(ActiveRuleDto::getProfileId, ActiveRuleDto::getRuleKey, ActiveRuleDto::getSeverityString)
+      .containsOnly(tuple(profile1.getId(), rule1.getKey(), BLOCKER), tuple(profile1.getId(), rule2.getKey(), MAJOR));
+
+    assertThat(underTest.selectByProfile(dbSession, profile2)).isEmpty();
   }
 
   @Test

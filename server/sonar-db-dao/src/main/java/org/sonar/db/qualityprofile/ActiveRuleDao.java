@@ -71,6 +71,10 @@ public class ActiveRuleDao implements Dao {
     return selectByProfileUuid(dbSession, profile.getKee());
   }
 
+  public List<ActiveRuleDto> selectByRuleProfile(DbSession dbSession, RulesProfileDto ruleProfileDto) {
+    return mapper(dbSession).selectByRuleProfileUuid(ruleProfileDto.getKee());
+  }
+
   public ActiveRuleDto insert(DbSession dbSession, ActiveRuleDto item) {
     Preconditions.checkArgument(item.getProfileId() != null, QUALITY_PROFILE_IS_NOT_PERSISTED);
     Preconditions.checkArgument(item.getRuleId() != null, RULE_IS_NOT_PERSISTED);

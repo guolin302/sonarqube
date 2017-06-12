@@ -116,6 +116,15 @@
     where oqp.uuid = #{id, jdbcType=VARCHAR}
   </select>
 
+  <select id="selectByRuleProfileUuid" parameterType="string" resultType="org.sonar.db.qualityprofile.ActiveRuleDto">
+    select
+    <include refid="activeRuleColumns"/>
+    from active_rules a
+    <include refid="activeRuleKeyJoin"/>
+    where
+      rp.kee = #{ruleProfileUuid, jdbcType=VARCHAR}
+  </select>
+
   <select id="selectByRuleId" parameterType="map" resultType="org.sonar.db.qualityprofile.OrgActiveRuleDto">
     select
     <include refid="orgActiveRuleColumns"/>
