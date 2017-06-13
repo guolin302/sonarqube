@@ -22,7 +22,7 @@ import React from 'react';
 import Helmet from 'react-helmet';
 import ProjectActivityPageHeader from './ProjectActivityPageHeader';
 import ProjectActivityAnalysesList from './ProjectActivityAnalysesList';
-import ProjectActivityPageFooter from './ProjectActivityPageFooter';
+import ProjectActivityGraphs from './ProjectActivityGraphs';
 import throwGlobalError from '../../../app/utils/throwGlobalError';
 import * as api from '../../../api/projectActivity';
 import * as actions from '../actions';
@@ -174,21 +174,21 @@ export default class ProjectActivityApp extends React.PureComponent {
 
         <ProjectActivityPageHeader category={query.category} updateQuery={this.updateQuery} />
 
-        <ProjectActivityAnalysesList
-          addCustomEvent={this.addCustomEvent}
-          addVersion={this.addVersion}
-          analyses={this.state.analyses}
-          canAdmin={canAdmin}
-          changeEvent={this.changeEvent}
-          deleteAnalysis={this.deleteAnalysis}
-          deleteEvent={this.deleteEvent}
-        />
+        <div className="layout-page">
+          <ProjectActivityAnalysesList
+            addCustomEvent={this.addCustomEvent}
+            addVersion={this.addVersion}
+            analyses={this.state.analyses}
+            canAdmin={canAdmin}
+            changeEvent={this.changeEvent}
+            deleteAnalysis={this.deleteAnalysis}
+            deleteEvent={this.deleteEvent}
+            fetchMoreActivity={this.fetchMoreActivity}
+            paging={this.state.paging}
+          />
 
-        <ProjectActivityPageFooter
-          analyses={this.state.analyses}
-          fetchMoreActivity={this.fetchMoreActivity}
-          paging={this.state.paging}
-        />
+          <ProjectActivityGraphs />
+        </div>
       </div>
     );
   }

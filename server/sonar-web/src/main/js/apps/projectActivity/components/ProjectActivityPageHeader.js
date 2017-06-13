@@ -43,21 +43,15 @@ export default class ProjectActivityPageHeader extends React.PureComponent {
 
     return (
       <header className="page-header">
-        <div className="page-actions">
-          <Select
-            className="input-medium"
-            placeholder={translate('filter_verb') + '...'}
-            clearable={true}
-            searchable={false}
-            value={this.props.category}
-            options={selectOptions}
-            onChange={this.handleCategoryChange}
-          />
-        </div>
-
-        <div className="page-description">
-          {translate('project_activity.page.description')}
-        </div>
+        <Select
+          className="input-medium"
+          placeholder={translate('project_activity.filter_events') + '...'}
+          clearable={true}
+          searchable={false}
+          value={this.props.category}
+          options={selectOptions}
+          onChange={this.handleCategoryChange}
+        />
       </header>
     );
   }
