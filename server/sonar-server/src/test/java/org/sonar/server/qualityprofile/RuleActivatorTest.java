@@ -695,7 +695,7 @@ public class RuleActivatorTest {
   }
 
   @Test
-  public void ignore_reset_if_not_activated()  {
+  public void ignore_reset_if_not_activated() {
     RuleDefinitionDto rule = createRule();
     QProfileDto parentProfile = createProfile(rule);
     QProfileDto childProfile = createChildProfile(parentProfile);
@@ -707,7 +707,7 @@ public class RuleActivatorTest {
   }
 
   @Test
-  public void unset_parent_when_no_parent_does_not_fail()  {
+  public void unset_parent_when_no_parent_does_not_fail() {
     RuleDefinitionDto rule = createRule();
     QProfileDto profile = createProfile(rule);
     underTest.setParent(db.getSession(), profile, null);
@@ -747,7 +747,7 @@ public class RuleActivatorTest {
   }
 
   @Test
-  public void cannot_set_parent_if_language_is_different()  {
+  public void cannot_set_parent_if_language_is_different() {
     RuleDefinitionDto rule1 = db.rules().insert(r -> r.setLanguage("foo"));
     RuleDefinitionDto rule2 = db.rules().insert(r -> r.setLanguage("bar"));
 
@@ -766,7 +766,7 @@ public class RuleActivatorTest {
   }
 
   @Test
-  public void set_then_unset_parent()  {
+  public void set_then_unset_parent() {
     RuleDefinitionDto rule1 = createJavaRule();
     RuleDefinitionDto rule2 = createJavaRule();
 
@@ -790,7 +790,7 @@ public class RuleActivatorTest {
   }
 
   @Test
-  public void set_then_unset_parent_keep_overridden_rules()  {
+  public void set_then_unset_parent_keep_overridden_rules() {
     RuleDefinitionDto rule1 = createJavaRule();
     RuleDefinitionDto rule2 = createJavaRule();
     QProfileDto profile1 = createProfile(rule1);
@@ -843,8 +843,7 @@ public class RuleActivatorTest {
     assertThat(bulkChangeResult.getChanges()).hasSize(bulkSize);
     assertThat(db.getDbClient().activeRuleDao().selectByProfile(db.getSession(), profile)).hasSize(bulkSize);
     rules.stream().forEach(
-      r -> assertThatRuleIsActivated(profile, r.getDefinition(), null, MINOR, null, emptyMap())
-    );
+      r -> assertThatRuleIsActivated(profile, r.getDefinition(), null, MINOR, null, emptyMap()));
   }
 
   @Test
@@ -879,8 +878,7 @@ public class RuleActivatorTest {
     assertThat(bulkChangeResult.getChanges()).hasSize(bulkSize);
     assertThat(db.getDbClient().activeRuleDao().selectByProfile(db.getSession(), profile)).hasSize(0);
     rules.stream().forEach(
-      r -> assertThatRuleIsNotPresent(profile, r.getDefinition())
-    );
+      r -> assertThatRuleIsNotPresent(profile, r.getDefinition()));
   }
 
   @Test
@@ -955,7 +953,7 @@ public class RuleActivatorTest {
     RuleDefinitionDto rule = createJavaRule();
     QProfileDto profile = db.qualityProfiles().insert(db.getDefaultOrganization(),
       p -> p.setLanguage(rule.getLanguage())
-          .setIsBuiltIn(true));
+        .setIsBuiltIn(true));
     QProfileDto childProfile = createChildProfile(profile);
     QProfileDto grandchildProfile = createChildProfile(childProfile);
 
@@ -1002,6 +1000,30 @@ public class RuleActivatorTest {
     assertThatRuleIsNotPresent(grandchildProfile, rule);
   }
 
+  @Test
+  public void delete_rule_from_all_profiles() {
+    RuleDefinitionDto rule = createRule();
+    QProfileDto parentProfile = createProfile(rule);
+    QProfileDto childProfile = createChildProfile(parentProfile);
+    QProfileDto grandChildProfile = createChildProfile(childProfile);
+
+    RuleActivation activation = RuleActivation.create(rule.getKey(), CRITICAL, null);
+    activate(parentProfile, activation);
+
+    RuleActivation overrideActivation = RuleActivation.create(rule.getKey(), BLOCKER, null);
+    activate(grandChildProfile, overrideActivation);
+
+    // Reset on parent do not change child nor grandchild
+    List<ActiveRuleChange> changes = underTest.delete(db.getSession(), rule);
+
+    assertThatRuleIsNotPresent(parentProfile, rule);
+    assertThatRuleIsNotPresent(childProfile, rule);
+    assertThatRuleIsNotPresent(grandChildProfile, rule);
+    assertThat(changes)
+      .extracting(ActiveRuleChange::getType)
+      .containsOnly(ActiveRuleChange.Type.DEACTIVATED)
+      .hasSize(3);
+  }
 
   private void assertThatProfileHasNoActiveRules(QProfileDto profile) {
     List<OrgActiveRuleDto> activeRules = db.getDbClient().activeRuleDao().selectByProfile(db.getSession(), profile);
