@@ -69,6 +69,7 @@ import static org.sonar.api.rule.Severity.BLOCKER;
 import static org.sonar.api.rule.Severity.CRITICAL;
 import static org.sonar.api.rule.Severity.MAJOR;
 import static org.sonar.api.rule.Severity.MINOR;
+import static org.sonar.db.rule.RuleTesting.newCustomRule;
 import static org.sonar.server.qualityprofile.ActiveRule.Inheritance.INHERITED;
 
 public class RuleActivatorTest {
@@ -373,6 +374,26 @@ public class RuleActivatorTest {
 
     RuleActivation activation = RuleActivation.create(rule.getKey(), null, of(param.getName(), "foo"));
     expectFailure("Value 'foo' must be an integer.", () -> activate(profile, activation));
+  }
+
+
+  @Test
+  public void ignore_parameters_when_activating_custom_rule() {
+    RuleDefinitionDto templateRule = db.rules().insert(r -> r.setIsTemplate(true));
+    RuleParamDto templateParam = db.rules().insertRuleParam(templateRule, p -> p.setName("format"));
+    RuleDefinitionDto customRule = db.rules().insert(newCustomRule(templateRule));
+    RuleParamDto customParam = db.rules().insertRuleParam(customRule, p -> p.setName("format").setDefaultValue("txt"));
+    QProfileDto profile = createProfile(customRule);
+
+    // initial activation
+    RuleActivation activation = RuleActivation.create(customRule.getKey(), MAJOR, emptyMap());
+    activate(profile, activation);
+    assertThatRuleIsActivated(profile, customRule, null, MAJOR, null, of("format", "txt"));
+
+    // update -> parameter is not changed
+    RuleActivation updateActivation = RuleActivation.create(customRule.getKey(), BLOCKER, of("format", "xml"));
+    activate(profile, updateActivation);
+    assertThatRuleIsActivated(profile, customRule, null, BLOCKER, null, of("format", "txt"));
   }
 
   @Test

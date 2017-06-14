@@ -85,41 +85,6 @@ public class RuleActivatorMediumTest {
 //
 //
 //
-
-
-//
-//  @Test
-//  public void ignore_parameters_when_activating_custom_rule() {
-//    // initial activation
-//    ActiveRuleKey activeRuleKey = ActiveRuleKey.of(XOO_P1_KEY, CUSTOM_RULE_KEY);
-//    RuleActivation activation = new RuleActivation(CUSTOM_RULE_KEY);
-//    activate(activation, XOO_P1_KEY);
-//
-//    // update
-//    RuleActivation update = new RuleActivation(CUSTOM_RULE_KEY)
-//      .setParameter("format", "xls");
-//    activate(update, XOO_P1_KEY);
-//
-//    assertThat(countActiveRules(XOO_P1_KEY)).isEqualTo(1);
-//    verifyHasActiveRuleInDb(activeRuleKey, MINOR, null, ImmutableMap.of("format", "txt"));
-//  }
-//
-//
-//  @Test
-//  public void deactivation_fails_if_profile_not_found() {
-//    ActiveRuleKey key = ActiveRuleKey.of("unknown", XOO_X1);
-//    try {
-//      ruleActivator.deactivateAndUpdateIndex(dbSession, key);
-//      fail();
-//    } catch (BadRequestException e) {
-//      assertThat(e).hasMessage("Quality profile not found: unknown");
-//    }
-//  }
-//
-//
-//  private QProfileDto selectProfile(String uuid) {
-//    return db.qualityProfileDao().selectByUuid(dbSession, uuid);
-//  }
 //
 //  @Test
 //  public void ignore_activation_errors_when_setting_parent() {
